@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/bit101/bitlib/blmath"
 	cairo "github.com/bit101/blcairo"
 	"github.com/bit101/blcairo/render"
 	"github.com/bit101/blcairo/target"
@@ -16,11 +17,11 @@ import (
 
 func main() {
 
-	renderTarget := target.Image
+	renderTarget := target.Video
 	// renderFrame := renderFrameDuck
-	// renderFrame := renderFrameGrid
+	renderFrame := renderFrameGrid
 	// renderFrame := renderFrameKali
-	renderFrame := renderFrameJulia
+	// renderFrame := renderFrameJulia
 	// renderFrame := renderFrameMandel
 	// renderFrame := renderFrameNovaBase
 	// renderFrame := renderFrameNovaRelaxed
@@ -37,7 +38,9 @@ func main() {
 	case target.Video:
 		seconds := 2
 		fps := 30
-		render.Frames(400, 400, seconds*fps, "out/frames", renderFrame)
+		w := 400.0
+		h := 400.0
+		render.Frames(w, h, seconds*fps, "out/frames", renderFrame)
 		render.ConvertToVideo("out/frames", "out/out.mp4", 400, 400, fps, seconds)
 		render.PlayVideo("out/out.mp4")
 		break
@@ -45,13 +48,16 @@ func main() {
 }
 
 func renderFrameDuck(context *cairo.Context, width, height, percent float64) {
-	cr := 0.4
+	// cr := 0.20 + math.Cos(percent*blmath.Tau)*0.02
+	// ci := -0.40 + math.Sin(percent*blmath.Tau)*0.02
+	cr := 0.38 + percent*0.04
 	ci := -0.2
 	cp := complexplane.FromCenterAndSize(-0.0, 0, 4, 4)
 
 	it := iterator.New(context, cp)
 	it.FractalFunc = algos.Duck(cr, ci)
-	it.ColorFunc = colorizors.Duck(1, 0.4, 0.4, 2)
+	it.ColorFunc = colorizors.Duck(1, 0.4, 0.4, 4)
+	// it.WarpFunc = warpers.Ripple(width/2, blmath.LerpSin(percent, 0, height), 200, 12, 0) // -percent*blmath.Tau)
 	it.Iterate(40)
 }
 
@@ -60,9 +66,13 @@ func renderFrameGrid(context *cairo.Context, width, height, percent float64) {
 	cp := complexplane.FromCenterAndSize(0.0, 0.0, size, size)
 
 	it := iterator.New(context, cp)
-	it.FractalFunc = algos.Grid(cp, 30)
+	// it.FractalFunc = algos.Checker(cp, 20)
+	it.FractalFunc = algos.Rings(cp, 40)
 	it.ColorFunc = colorizors.GreyScale(1, 0)
-	it.WarpFunc = warpers.Fisheye(width/2, height/2, width/2)
+	it.WarpFunc = warpers.Swirl(width/4, height/4, blmath.LerpSin(percent, width/4, width))
+	// it.WarpFunc = warpers.Simplex(blmath.LerpSin(percent, 0, 1), 0.0015, 20)
+	// it.WarpFunc = warpers.Fisheye(blmath.LerpSin(percent, 0, width), blmath.LerpSin(percent, 0, height), width)
+	// it.WarpFunc = warpers.Ripple(width/2, height/2, 50, 5, percent*blmath.Tau)
 	it.Iterate(80)
 }
 

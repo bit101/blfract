@@ -37,6 +37,18 @@ func Fisheye(cx, cy, radius float64) Warper {
 	}
 }
 
+// Ripple returns a warper that warps a complex plane ripple effect.
+func Ripple(cx, cy, wavelength, offset, phase float64) Warper {
+	return func(x, y float64) (float64, float64) {
+		x -= cx
+		y -= cy
+		d := math.Hypot(x, y)
+		r := d + math.Sin(d/wavelength*blmath.Tau+phase)*offset
+		a := math.Atan2(y, x)
+		return cx + math.Cos(a)*r, cy + math.Sin(a)*r
+	}
+}
+
 // Swirl returns a warper that warps a complex plane with a fisheye lens effect.
 func Swirl(cx, cy, radius float64) Warper {
 	return func(x, y float64) (float64, float64) {

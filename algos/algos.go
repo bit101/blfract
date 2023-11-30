@@ -31,12 +31,25 @@ func Duck(cr, ci float64) Algo {
 	}
 }
 
-// Grid just generates a grid of res many lines. Not actually a fractal at all, but useful for debugging warpers.
-func Grid(cp *complexplane.ComplexPlane, res float64) Algo {
+// Checker just generates a checkerboard pattern. Not actually a fractal at all, but useful for debugging warpers.
+func Checker(cp *complexplane.ComplexPlane, res float64) Algo {
 	return func(r, i, iter float64) float64 {
-		x := blmath.Map(r, cp.RealMin, cp.RealMax, 0, res)
-		y := blmath.Map(i, cp.ImagMin, cp.ImagMax, 0, res)
-		if math.Abs(math.Mod(x, 1)) < 0.05 || math.Abs(math.Mod(y, 1)) < 0.05 {
+		x := int(blmath.Map(r, cp.RealMin, cp.RealMax, 0, res))
+		y := int(blmath.Map(i, cp.ImagMin, cp.ImagMax, 0, res))
+		if x%2 == y%2 {
+			return 1.0
+		}
+		return 0.0
+	}
+}
+
+// Rings just generates a ring pattern. Not actually a fractal at all, but useful for debugging warpers.
+func Rings(cp *complexplane.ComplexPlane, res float64) Algo {
+	return func(r, i, iter float64) float64 {
+		x := blmath.Map(r, cp.RealMin, cp.RealMax, -res/2, res/2)
+		y := blmath.Map(i, cp.ImagMin, cp.ImagMax, -res/2, res/2)
+		d := int(math.Hypot(x, y))
+		if d%2 == 0 {
 			return 1.0
 		}
 		return 0.0
