@@ -2,6 +2,8 @@
 package iterator
 
 import (
+	"fmt"
+
 	"github.com/bit101/bitlib/blmath"
 	cairo "github.com/bit101/blcairo"
 	"github.com/bit101/blfract/algos"
@@ -45,4 +47,20 @@ func (i *Iterator) Iterate(iter int) {
 			i.Context.FillRectangle(x, y, 1, 1)
 		}
 	}
+}
+
+func (i *Iterator) PrintParams(params ...any) {
+	i.Context.Save()
+	i.Context.SetFontSize(14)
+	x := 11.0
+	y := 16.0
+	for j := 0; j < len(params); j += 2 {
+		s := fmt.Sprintf("%v: %v", params[j], params[j+1])
+		i.Context.SetSourceBlack()
+		i.Context.FillText(fmt.Sprintf(s), x+1, y+1)
+		i.Context.SetSourceWhite()
+		i.Context.FillText(fmt.Sprintf(s), x, y)
+		y += 16.0
+	}
+	i.Context.Restore()
 }
